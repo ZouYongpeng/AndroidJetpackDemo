@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".workmanager.WorkManagerActivity">
+
+    <Button
+        android:id="@+id/one_time_btn"
+        style="@style/button_style"
+        android:text="one time"/>
+
+    <Button
+        android:id="@+id/periodic_time_btn"
+        style="@style/button_style"
+        android:text="periodic time"/>
+
+    <Button
+        android:id="@+id/order_btn"
+        style="@style/button_style"
+        android:text="order requests"/>
+
+    <Button
+        android:id="@+id/cancel_all_worker_btn"
+        style="@style/button_style"
+        android:text="cancel all worker"/>
+
+</LinearLayout>
