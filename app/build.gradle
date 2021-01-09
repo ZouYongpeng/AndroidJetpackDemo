@@ -40,20 +40,21 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-//    implementation "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
-
-    /* 
-     * Jetpack WorkManger
-     */
+    // Jetpack WorkManger
     def work_manager_version = "2.4.0"
-    // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
-    //implementation "androidx.work:work-runtime:$work_manager_version"// (Java only)
-    //implementation "androidx.work:work-rxjava2:$work_manager_version"// optional - RxJava2 support
-    //implementation "androidx.work:work-gcm:$work_manager_version"// optional - GCMNetworkManager support
-    //androidTestImplementation "androidx.work:work-testing:$work_manager_version"// optional - Test helpers
+
+    // Jetpack Activity
+    def activity_version = "1.1.0"
+    implementation "androidx.activity:activity-ktx:$activity_version"
+
+    // Jetpack Navigation
+    def nav_version = "2.3.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 }

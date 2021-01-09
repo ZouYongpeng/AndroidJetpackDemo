@@ -3,36 +3,36 @@ package com.example.androidjetpackdemo.workmanager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.work.*
+import com.example.androidjetpackdemo.MainFragment.Companion.KEY_BUNDLE
 import com.example.androidjetpackdemo.R
-import kotlinx.android.synthetic.main.activity_work_manager.*
 import java.util.concurrent.TimeUnit
 
-class WorkManagerActivity : AppCompatActivity() {
+class WorkManagerFragment : Fragment() {
 
     companion object {
-        const val TAG = "Work Manager"
+        const val TAG = "WorkManager"
         const val WORK_REQUEST_DATA_KEY = "WORK_REQUEST_DATA_KEY"
         const val WORKER_DATA_KEY = "WORKER_DATA_KEY"
     }
 
     /**
-     * Step 1 : 定义任务
+     * Step 1 : 自定义Worker，需要重写 doWork() 实现具体业务逻辑
      */
     private lateinit var alarmWorker: AlarmWorker
 
-    private val workManager by lazy { WorkManager.getInstance(this) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_work_manager)
-
-        /**
-         * Step 2 : 设置约束条件 constraints
-         */
-        var constraints = Constraints.Builder().apply {
+    /**
+     * Step 2 : 设置约束条件 constraints
+     */
+    private val constraints by lazy {
+        Constraints.Builder().apply {
             // true 表示充电时执行，默认为 false
             setRequiresCharging(true)
             // true 表示空闲时运行，默认为 false
@@ -46,13 +46,13 @@ class WorkManagerActivity : AppCompatActivity() {
             // 设置是否尽在内存充足时运行，默认为 false
             setRequiresStorageNotLow(true)
         }.build()
+    }
 
-        /**
-         * Step 3 : 将 Constraints设置给 WorkRequest
-         * OneTimeWorkRequest  ：一次性任务
-         * PeriodicWorkRequest ：周期性任务
-         */
-        var oneTimeWorkRequest = OneTimeWorkRequest.Builder(AlarmWorker::class.java)
+    /**
+     * Step 3 : 把 自定义Worker 及 constraints 设置给 WorkRequest
+     */
+    private val oneTimeWorkRequest by lazy {
+        OneTimeWorkRequest.Builder(AlarmWorker::class.java)
             // 设置约束条件
             .setConstraints(constraints)
             // 设置延迟10秒后执行
@@ -66,20 +66,27 @@ class WorkManagerActivity : AppCompatActivity() {
             // 可以通过setInputData()方法向Worker传递数据
             .setInputData(Data.Builder().putString(WORK_REQUEST_DATA_KEY,"one_time").build())
             .build()
+    }
 
-        /**
-         * Step 4 : WorkManager 实例把 WorkRequest 放入执行队列
-         */
-//        workManager.enqueue(oneTimeWorkRequest)
+    /**
+     * Step 4 : WorkManager.enqueue(oneTimeWorkRequest) 把 WorkRequest 放入执行队列
+     */
+    private val workManager by lazy { context?.let { WorkManager.getInstance(it) } }
 
-        /**
-         * Step 5 : 通过 WorkInfo 获知任务的状态
-         */
-        var workInfoByRequestId = workManager.getWorkInfoById(oneTimeWorkRequest.id)
-        var workInfoByRequestTag = workManager.cancelAllWorkByTag("AlarmOneTimeTag")
-        var workInfoForUniqueWork = workManager.getWorkInfosForUniqueWork("")
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val stringFromMainFragment = arguments?.getString(KEY_BUNDLE, "NO DATA")
+        Log.d(TAG, "onCreateView: $stringFromMainFragment")
+        return inflater.inflate(R.layout.fragment_work_manager, container, false)?.apply {
+            initButton()
+        }
+    }
 
-        one_time_btn.setOnClickListener {
+    private fun View.initButton() {
+        Log.d(TAG, "initButton: ")
+        findViewById<Button>(R.id.one_time_btn).setOnClickListener {
             Log.d(TAG, "click one_time_btn")
             val oneTimeWorkRequest = OneTimeWorkRequest
                 .Builder(AlarmWorker::class.java)
@@ -88,11 +95,11 @@ class WorkManagerActivity : AppCompatActivity() {
                 .addTag("AlarmOneTimeTag")
                 .setInputData(Data.Builder().putString(WORK_REQUEST_DATA_KEY,"one_time").build())
                 .build()
-            workManager.enqueue(oneTimeWorkRequest)
-            workManager.observerWorkInfo(oneTimeWorkRequest)
+            workManager?.enqueue(oneTimeWorkRequest)
+            workManager?.observerWorkInfo(oneTimeWorkRequest)
         }
 
-        periodic_time_btn.setOnClickListener {
+        findViewById<Button>(R.id.periodic_time_btn).setOnClickListener {
             Log.d(TAG, "click periodic_time_btn")
             val periodicWorkRequest = PeriodicWorkRequest
                 // 最小时间间隔是 15 分钟,如果设置了1秒，源码也会改为15分钟
@@ -102,16 +109,11 @@ class WorkManagerActivity : AppCompatActivity() {
                 .addTag("AlarmOneTimeTag")
                 .setInputData(Data.Builder().putString(WORK_REQUEST_DATA_KEY, "periodic_time").build())
                 .build()
-            workManager.enqueue(periodicWorkRequest)
-            workManager.getWorkInfoByIdLiveData(periodicWorkRequest.id).observe(this, Observer {
-                // 由于 periodicWorkRequest 会一直执行，不会收到 success data
-                it?.apply {
-                    Log.d(TAG, "workManager getData: state = $state , message = ${outputData.getString(WORKER_DATA_KEY)}")
-                }
-            })
+            workManager?.enqueue(periodicWorkRequest)
+            workManager?.observerWorkInfo(periodicWorkRequest)
         }
 
-        order_btn.setOnClickListener {
+        findViewById<Button>(R.id.order_btn).setOnClickListener {
             Log.d(TAG, "click order_btn")
             val firstWorkRequest = OneTimeWorkRequest
                 .Builder(AlarmWorker::class.java)
@@ -132,30 +134,41 @@ class WorkManagerActivity : AppCompatActivity() {
                 .setInputData(Data.Builder().putString(WORK_REQUEST_DATA_KEY,"third").build())
                 .build()
             // 1 -> 2 -> 3
-//            workManager.beginWith(firstWorkRequest).then(secondWorkRequest).then(thirdWorkRequest).enqueue()
+            workManager?.beginWith(firstWorkRequest)?.then(secondWorkRequest)?.then(thirdWorkRequest)?.enqueue()
             // 1,2 -> 3
-            workManager.beginWith(listOf(firstWorkRequest, secondWorkRequest)).then(thirdWorkRequest).enqueue()
+//            workManager?.beginWith(listOf(firstWorkRequest, secondWorkRequest))?.then(thirdWorkRequest)?.enqueue()
             // 1 -> 2,3
-            workManager.beginWith(firstWorkRequest).then(listOf(secondWorkRequest, thirdWorkRequest)).enqueue()
+//            workManager?.beginWith(firstWorkRequest)?.then(listOf(secondWorkRequest, thirdWorkRequest))?.enqueue()
 
-            workManager.observerWorkInfo(firstWorkRequest)
-            workManager.observerWorkInfo(secondWorkRequest)
-            workManager.observerWorkInfo(thirdWorkRequest)
+            workManager?.observerWorkInfo(firstWorkRequest)
+            workManager?.observerWorkInfo(secondWorkRequest)
+            workManager?.observerWorkInfo(thirdWorkRequest)
         }
 
-        cancel_all_worker_btn.setOnClickListener {
+        findViewById<Button>(R.id.cancel_all_worker_btn).setOnClickListener {
             Log.d(TAG, "cancel_all_worker_btn")
-            workManager.cancelAllWork()
+            workManager?.cancelAllWork()
         }
-
     }
 
+    /**
+     * 获知任务的状态
+     * getWorkInfoById / getWorkInfosByTag / getWorkInfosForUniqueWork
+     */
     private fun WorkManager.observerWorkInfo(workRequest: WorkRequest) {
-        getWorkInfoByIdLiveData(workRequest.id).observe(this@WorkManagerActivity, Observer {
-            it?.apply {
-                Log.d(TAG, "workManager getData: state = $state , message = ${outputData.getString(WORKER_DATA_KEY)}")
-            }
-        })
+        takeIf { activity is LifecycleOwner}.apply {
+            getWorkInfoByIdLiveData(workRequest.id).observe(activity as LifecycleOwner, Observer {
+                // PS : 由于 periodicWorkRequest 会一直执行，不会收到 success data
+                it?.apply {
+                    Log.d(
+                        TAG,
+                        "workManager getData: " +
+                                "state = $state , " +
+                                "message = ${outputData.getString(WORKER_DATA_KEY)}")
+                }
+            })
+        }
+
     }
 
 }

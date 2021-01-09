@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/work_manager_btn"
-        style="@style/button_style"
-        android:text="Work Manager Demo" />
+    <!--
+        android:name         属性值为 NavHost 实现类的全类名
+        app:navGraph         属性将 NavHostFragment 与导航图相关联。
+        app:defaultNavHost   属性“true”确保 NavHostFragment 会拦截系统返回按钮
+    -->
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/nav_jetpack_demo"
+        app:defaultNavHost="true"
+        />
 
-</LinearLayout>
+</FrameLayout>

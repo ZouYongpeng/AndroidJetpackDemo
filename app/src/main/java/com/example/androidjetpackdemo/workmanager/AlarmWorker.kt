@@ -21,9 +21,9 @@ class AlarmWorker(context: Context, workerParams: WorkerParameters) : Worker(con
         Log.d(TAG, "AlarmWorker doWork")
 
         // 接受 WorkRequest 发过来的信息
-        var inputString = inputData.getString(WorkManagerActivity.WORK_REQUEST_DATA_KEY)
+        var inputString = inputData.getString(WorkManagerFragment.WORK_REQUEST_DATA_KEY)
         // 向 WorkManager 传递数据
-        var outputData = Data.Builder().putString(WorkManagerActivity.WORKER_DATA_KEY,"$inputString , I am working").build()
+        var outputData = Data.Builder().putString(WorkManagerFragment.WORKER_DATA_KEY,"$inputString , I am working").build()
         /*
          * 执行成功返回Result.success()
          * 执行失败返回Result.failure()

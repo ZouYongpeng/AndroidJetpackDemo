@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_jetpack_demo"
+    app:startDestination="@id/mainFragment">
+    <!--startDestination 设置起始Destination 为 mainFragment -->
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.androidjetpackdemo.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <!--
+            enterAnim:B頁面進入動畫。
+            exitAnim:A頁面退出動畫。
+            popEnterAnim:返回A頁面進入動畫。
+            popExitAnim:返回B頁面退出動畫。
+        -->
+        <action
+            android:id="@+id/action_mainFragment_to_workManagerFragment"
+            app:destination="@id/workManagerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:launchSingleTop="false"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/workManagerFragment"
+        android:name="com.example.androidjetpackdemo.workmanager.WorkManagerFragment"
+        android:label="fragment_work_manager"
+        tools:layout="@layout/fragment_work_manager" >
+
+        <argument
+            android:defaultValue="Hello, WorkManager"
+            android:name="data"
+            app:argType="string"/>
+
+    </fragment>
+
+
+</navigation>
