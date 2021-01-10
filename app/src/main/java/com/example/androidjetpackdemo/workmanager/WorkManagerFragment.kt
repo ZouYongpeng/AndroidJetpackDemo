@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.work.*
 import com.example.androidjetpackdemo.MainFragment.Companion.KEY_BUNDLE
 import com.example.androidjetpackdemo.R
+import com.example.androidjetpackdemo.databinding.FragmentWorkManagerBinding
 import java.util.concurrent.TimeUnit
 
 class WorkManagerFragment : Fragment() {
@@ -73,20 +74,22 @@ class WorkManagerFragment : Fragment() {
      */
     private val workManager by lazy { context?.let { WorkManager.getInstance(it) } }
 
+    private lateinit var binding: FragmentWorkManagerBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val stringFromMainFragment = arguments?.getString(KEY_BUNDLE, "NO DATA")
         Log.d(TAG, "onCreateView: $stringFromMainFragment")
-        return inflater.inflate(R.layout.fragment_work_manager, container, false)?.apply {
-            initButton()
-        }
+
+        binding = FragmentWorkManagerBinding.inflate(inflater).apply { initButton() }
+        return binding.root
     }
 
-    private fun View.initButton() {
+    private fun FragmentWorkManagerBinding.initButton() {
         Log.d(TAG, "initButton: ")
-        findViewById<Button>(R.id.one_time_btn).setOnClickListener {
+        oneTimeBtn.setOnClickListener {
             Log.d(TAG, "click one_time_btn")
             val oneTimeWorkRequest = OneTimeWorkRequest
                 .Builder(AlarmWorker::class.java)
@@ -98,8 +101,7 @@ class WorkManagerFragment : Fragment() {
             workManager?.enqueue(oneTimeWorkRequest)
             workManager?.observerWorkInfo(oneTimeWorkRequest)
         }
-
-        findViewById<Button>(R.id.periodic_time_btn).setOnClickListener {
+        periodicTimeBtn.setOnClickListener {
             Log.d(TAG, "click periodic_time_btn")
             val periodicWorkRequest = PeriodicWorkRequest
                 // 最小时间间隔是 15 分钟,如果设置了1秒，源码也会改为15分钟
@@ -113,7 +115,7 @@ class WorkManagerFragment : Fragment() {
             workManager?.observerWorkInfo(periodicWorkRequest)
         }
 
-        findViewById<Button>(R.id.order_btn).setOnClickListener {
+        orderBtn.setOnClickListener {
             Log.d(TAG, "click order_btn")
             val firstWorkRequest = OneTimeWorkRequest
                 .Builder(AlarmWorker::class.java)
@@ -145,7 +147,7 @@ class WorkManagerFragment : Fragment() {
             workManager?.observerWorkInfo(thirdWorkRequest)
         }
 
-        findViewById<Button>(R.id.cancel_all_worker_btn).setOnClickListener {
+        cancelAllWorkerBtn.setOnClickListener {
             Log.d(TAG, "cancel_all_worker_btn")
             workManager?.cancelAllWork()
         }

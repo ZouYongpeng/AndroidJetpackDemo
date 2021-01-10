@@ -11,4 +11,9 @@
         style="@style/button_style"
         android:text="Work Manager Demo" />
 
+    <Button
+        android:id="@+id/data_binding_btn"
+        style="@style/button_style"
+        android:text="View Binding Demo" />
+
 </LinearLayout>

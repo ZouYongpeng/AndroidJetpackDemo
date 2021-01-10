@@ -22,9 +22,15 @@
             app:destination="@id/workManagerFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
-            app:launchSingleTop="false"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mainFragment_to_dataBindFragment"
+            app:destination="@id/dataBindFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -39,6 +45,11 @@
             app:argType="string"/>
 
     </fragment>
+    <fragment
+        android:id="@+id/dataBindFragment"
+        android:name="com.example.androidjetpackdemo.databinding.DataBindFragment"
+        android:label="fragment_data_bind"
+        tools:layout="@layout/fragment_data_bind" />
 
 
 </navigation>

@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import com.example.androidjetpackdemo.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
+
+    private lateinit var binding: FragmentMainBinding
 
     companion object {
         const val KEY_BUNDLE = "KEY_BUNDLE"
@@ -18,14 +21,19 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_main, container, false)
-        view.findViewById<Button>(R.id.work_manager_btn).executeNavAction(
+        binding =  FragmentMainBinding.inflate(inflater).apply { initButton() }
+        return binding.root
+    }
+
+    private fun FragmentMainBinding.initButton() {
+        workManagerBtn.executeNavAction(
             R.id.action_mainFragment_to_workManagerFragment,
             Bundle().let {
                 it.putString(KEY_BUNDLE, "Hello, WorkManager!")
                 it
             })
-        return view
+        dataBindingBtn.executeNavAction(
+            R.id.action_mainFragment_to_dataBindFragment)
     }
 
     private fun Button.executeNavAction(actionId : Int, bundle: Bundle? = null) {
